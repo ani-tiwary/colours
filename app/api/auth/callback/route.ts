@@ -1,0 +1,62 @@
+import { NextResponse } from 'next/server';
+
+const REDIRECT_URI = 'https://127.0.0.1:3000/api/auth/callback';
+const BASE_URL = 'https://127.0.0.1:3000';
+
+export async function GET(request: Request) {
+  try {
+    if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
+      return NextResponse.redirect(`${BASE_URL}/?error=missing_credentials`);
+    }
+
+    const { searchParams } = new URL(request.url);
+    const code = searchParams.get('code');
+
+    if (!code) {
+      return NextResponse.redirect(`${BASE_URL}/?error=no_code`);
+    }
+
+    const authHeader = `Basic ${Buffer.from(
+      `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+    ).toString('base64')}`;
+
+    const requestBody = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+    }).toString();
+
+    const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': authHeader,
+      },
+      body: requestBody,
+    });
+
+    if (!tokenResponse.ok) {
+      return NextResponse.redirect(`${BASE_URL}/?error=token_failed&status=${tokenResponse.status}`);
+    }
+
+    const tokens = await tokenResponse.json();
+
+    const response = NextResponse.redirect(`${BASE_URL}/playlists`);
+    response.cookies.set('access_token', tokens.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: tokens.expires_in,
+    });
+    response.cookies.set('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+    });
+
+    return response;
+  } catch (error) {
+    return NextResponse.redirect(`${BASE_URL}/?error=auth_failed`);
+  }
+} 
