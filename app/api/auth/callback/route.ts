@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 
-const REDIRECT_URI = 'https://127.0.0.1:3000/api/auth/callback';
-const BASE_URL = 'https://127.0.0.1:3000';
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? process.env.NEXT_PUBLIC_BASE_URL
+  : 'https://127.0.0.1:3000';
+
+const REDIRECT_URI = `${BASE_URL}/api/auth/callback`;
 
 export async function GET(request: Request) {
   try {
