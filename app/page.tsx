@@ -1,11 +1,23 @@
 import React from 'react';
 
 async function getArtistData() {
-  const res = await fetch(`https://${process.env.NEXT_PUBLIC_BASE_URL}/api/artist`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch artist data');
-  return res.json();
+  try {
+    const res = await fetch('https://api.spotify.com/v1/artists/2YZyLoL8N0Wb9xBt1NhZWg', {
+      headers: {
+        'Authorization': `Bearer ${process.env.SPOTIFY_ACCESS_TOKEN}`,
+      },
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to fetch artist data');
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching artist data:', error);
+    return { name: 'Error', followers: { total: 0 }, popularity: 0 };
+  }
 }
 
 export default async function Home() {
