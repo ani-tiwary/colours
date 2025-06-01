@@ -1,10 +1,13 @@
 import React from 'react';
+import { getSpotifyAccessToken } from './utils/spotify';
 
 async function getArtistData() {
   try {
+    const accessToken = await getSpotifyAccessToken();
+    
     const res = await fetch('https://api.spotify.com/v1/artists/2YZyLoL8N0Wb9xBt1NhZWg', {
       headers: {
-        'Authorization': `Bearer ${process.env.SPOTIFY_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
       cache: 'no-store'
     });
