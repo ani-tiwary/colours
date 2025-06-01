@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 
+function ensureHttps(url: string) {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
 const BASE_URL = process.env.NODE_ENV === 'production'
-  ? process.env.NEXT_PUBLIC_BASE_URL
+  ? ensureHttps(process.env.NEXT_PUBLIC_BASE_URL || '')
   : 'https://127.0.0.1:3000';
 
 const REDIRECT_URI = `${BASE_URL}/api/auth/callback`;

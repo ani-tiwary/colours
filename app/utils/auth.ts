@@ -1,12 +1,21 @@
 export const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
 
+function ensureHttps(url: string) {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
 export function getSpotifyAuthUrl() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   
   // Use the deployed URL in production, localhost in development
-  const redirectUri = process.env.NODE_ENV === 'production'
-    ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback`
-    : 'https://127.0.0.1:3000/api/auth/callback';
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? ensureHttps(process.env.NEXT_PUBLIC_BASE_URL || '')
+    : 'https://127.0.0.1:3000';
+
+  const redirectUri = `${baseUrl}/api/auth/callback`;
 
   const params = new URLSearchParams({
     client_id: clientId!,
