@@ -8,7 +8,12 @@ function ensureHttps(url: string) {
 }
 
 export function getSpotifyAuthUrl() {
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  
+  if (!clientId) {
+    console.error('NEXT_PUBLIC_SPOTIFY_CLIENT_ID is not defined');
+    throw new Error('Spotify client ID is not configured');
+  }
   
   // Use the deployed URL in production, localhost in development
   const baseUrl = process.env.NODE_ENV === 'production'
@@ -18,7 +23,7 @@ export function getSpotifyAuthUrl() {
   const redirectUri = `${baseUrl}/api/auth/callback`;
 
   const params = new URLSearchParams({
-    client_id: clientId!,
+    client_id: clientId,
     response_type: 'code',
     redirect_uri: redirectUri,
     scope: 'playlist-read-private playlist-read-collaborative',
