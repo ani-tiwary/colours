@@ -13,6 +13,7 @@ export async function GET() {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
+        cache: 'no-store'
       }
     );
 

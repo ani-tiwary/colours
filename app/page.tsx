@@ -1,7 +1,7 @@
 import React from 'react';
 
 async function getArtistData() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/artist`, {
+  const res = await fetch(`https://${process.env.NEXT_PUBLIC_BASE_URL}/api/artist`, {
     cache: 'no-store'
   });
   if (!res.ok) throw new Error('Failed to fetch artist data');
