@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       grant_type: 'authorization_code',
       code,
       redirect_uri: REDIRECT_URI,
+      scope: 'playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private',
     }).toString();
 
     const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
@@ -46,7 +47,10 @@ export async function GET(request: Request) {
     });
 
     if (!tokenResponse.ok) {
-      return NextResponse.redirect(`${BASE_URL}/?error=token_failed&status=${tokenResponse.status}`);
+      const error = await tokenResponse.json().catch(() => ({}));
+      return NextResponse.redirect(
+        `${BASE_URL}/?error=token_failed&status=${tokenResponse.status}&message=${error.error_description || 'Unknown error'}`
+      );
     }
 
     const tokens = await tokenResponse.json();
@@ -67,6 +71,7 @@ export async function GET(request: Request) {
 
     return response;
   } catch (error) {
+    console.error('Auth error:', error);
     return NextResponse.redirect(`${BASE_URL}/?error=auth_failed`);
   }
 } 

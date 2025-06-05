@@ -26,7 +26,7 @@ export function getSpotifyAuthUrl() {
     client_id: clientId,
     response_type: 'code',
     redirect_uri: redirectUri,
-    scope: 'playlist-read-private playlist-read-collaborative',
+    scope: 'playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private',
   });
 
   return `${SPOTIFY_AUTH_URL}?${params.toString()}`;

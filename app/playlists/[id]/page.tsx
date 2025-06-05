@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import SortButton from './SortButton';
 
 async function getPlaylistDetails(playlistId: string, accessToken: string) {
   const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
@@ -39,7 +40,8 @@ export default async function PlaylistPage({ params }: { params: { id: string } 
           <div>
             <h1 className="text-4xl font-bold mb-4">{playlist.name}</h1>
             <p className="text-gray-600 mb-2">{playlist.description}</p>
-            <p className="text-gray-600">{playlist.tracks.total} tracks</p>
+            <p className="text-gray-600 mb-4">{playlist.tracks.total} tracks</p>
+            <SortButton playlistId={params.id} />
           </div>
         </div>
 
